@@ -55,6 +55,11 @@ void do_update(FORM *form, FIELD **field)
       v >>= 63 - end;
     }
   }
+  else
+  {
+    start = 0;
+    end = 63;
+  }
 
   ull2bin(v, buf);
   set_field_buffer(field[2], 0, buf);
@@ -64,15 +69,18 @@ void do_update(FORM *form, FIELD **field)
   set_field_buffer(field[4], 0, buf);
   snprintf(buf, CUTBUF_LEN - 1, "%llx", v);
   set_field_buffer(field[5], 0, buf);
+  snprintf(buf, CUTBUF_LEN - 1, "[%u:0] = %u bits", end, end + 1);
+  set_field_buffer(field[6], 0, buf);
 }
 
 int main(int ac, char **av)
 {
-  FIELD *field[13];
+  FIELD *field[15];
   FORM *form;
   char cutbuf[CUTBUF_LEN];
   int quit;
   int ch;
+  int i;
 
   cutbuf[0] = '\0';
   
@@ -81,44 +89,28 @@ int main(int ac, char **av)
   keypad(stdscr, TRUE);
   noecho();
 
-  field[0] = new_field(1, CUTBUF_LEN - 1, 1, 12, 0, 0);
-  field[1] = new_field(1, CUTBUF_LEN - 1, 2, 12, 0, 0);
-  field[2] = new_field(1, CUTBUF_LEN - 1, 4, 12, 0, 0);
-  field[3] = new_field(1, CUTBUF_LEN - 1, 5, 12, 0, 0);
-  field[4] = new_field(1, CUTBUF_LEN - 1, 6, 12, 0, 0);
-  field[5] = new_field(1, CUTBUF_LEN - 1, 7, 12, 0, 0);
-  field[6] = new_field(1, 10, 1, 1, 0, 0);
-  field[7] = new_field(1, 10, 2, 1, 0, 0);
-  field[8] = new_field(1, 10, 4, 1, 0, 0);
-  field[9] = new_field(1, 10, 5, 1, 0, 0);
-  field[10] = new_field(1, 10, 6, 1, 0, 0);
-  field[11] = new_field(1, 10, 7, 1, 0, 0);
-  field[12] = NULL;
+  for (i = 0; i < 7; i++)
+    field[i] = new_field(1, CUTBUF_LEN - 1, i + 1, 12, 0, 0);
+  for (i = 7; i < 14; i++)
+    field[i] = new_field(1, 10, i - 6, 1, 0, 0);
+  field[14] = NULL;
 
-  set_field_back(field[0], A_UNDERLINE);
-  field_opts_off(field[0], O_AUTOSKIP);
-  field_opts_off(field[0], O_BLANK);
-  set_field_back(field[1], A_UNDERLINE);
-  field_opts_off(field[1], O_AUTOSKIP);
-  field_opts_off(field[1], O_BLANK);
+  for (i = 0; i < 2; i++)
+  {
+    set_field_back(field[i], A_UNDERLINE);
+    field_opts_off(field[i], O_AUTOSKIP);
+    field_opts_off(field[i], O_BLANK);
+  }
 
-  field_opts_off(field[2], O_ACTIVE);
-  field_opts_off(field[3], O_ACTIVE);
-  field_opts_off(field[4], O_ACTIVE);
-  field_opts_off(field[5], O_ACTIVE);
-  field_opts_off(field[6], O_ACTIVE);
-  field_opts_off(field[7], O_ACTIVE);
-  field_opts_off(field[8], O_ACTIVE);
-  field_opts_off(field[9], O_ACTIVE);
-  field_opts_off(field[10], O_ACTIVE);
-  field_opts_off(field[11], O_ACTIVE);
-
-  set_field_buffer(field[6], 0, "value   :");
-  set_field_buffer(field[7], 0, "bit sli.:");
-  set_field_buffer(field[8], 0, "binary  :");
-  set_field_buffer(field[9], 0, "octal   :");
-  set_field_buffer(field[10], 0, "decimal :");
-  set_field_buffer(field[11], 0, "hexa    :");
+  for (i = 2; i < 14; i++)
+    field_opts_off(field[i], O_ACTIVE);
+  set_field_buffer(field[7], 0, "value   :");
+  set_field_buffer(field[8], 0, "bit sli.:");
+  set_field_buffer(field[9], 0, "binary  :");
+  set_field_buffer(field[10], 0, "octal   :");
+  set_field_buffer(field[11], 0, "decimal :");
+  set_field_buffer(field[12], 0, "hexa    :");
+  set_field_buffer(field[13], 0, "bit vec.:");
   
   form = new_form(field);
   post_form(form);
@@ -178,8 +170,8 @@ int main(int ac, char **av)
 
   unpost_form(form);
   free_form(form);
-  free_field(field[0]);
-  free_field(field[1]);
+  for (i = 0; i < 14; i++)
+    free_field(field[i]);
   
   endwin();
   return EXIT_SUCCESS;
