@@ -9,13 +9,15 @@
 #define KEY_CTRL(K) ((K) & 0x1f)
 #define CUTBUF_LEN 67
 
-void ull2bin(unsigned long long v, char *buf)
+void ull2bin(unsigned long long v, unsigned end, char *buf)
 {
+  int s;
   int i;
 
-  for (i = 64; i > 0; i--)
-    buf[64 - i] = (v & (1ULL << (i - 1))) ? '1' : '0';
-  buf[64] = '\0';
+  s = end + 1;
+  for (i = s; i > 0; i--)
+    buf[s - i] = (v & (1ULL << (i - 1))) ? '1' : '0';
+  buf[s - i] = '\0';
 }
 
 void do_update(FORM *form, FIELD **field)
@@ -63,7 +65,7 @@ void do_update(FORM *form, FIELD **field)
     end = 63;
   }
 
-  ull2bin(v, buf);
+  ull2bin(v, end, buf);
   set_field_buffer(field[2], 0, buf);
   snprintf(buf, CUTBUF_LEN - 1, "%llo", v);
   set_field_buffer(field[3], 0, buf);
