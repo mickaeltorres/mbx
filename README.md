@@ -1,4 +1,4 @@
-# mbx
+# MBX
 
 Base converter with ability to take bit slice.
 
@@ -15,3 +15,7 @@ Then you can enter a bit slice to use on the second field like:
 It will use only the bits between start and end inclusive.
 
 Ctrl+C or Ctrl+Q to quit.
+
+# Why ?
+
+Made while developping/debugging verilog code, after spending way too many hours counting bits on the screen in bc.
