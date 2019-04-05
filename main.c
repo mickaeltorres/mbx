@@ -22,6 +22,8 @@ void ull2bin(unsigned long long v, unsigned end, char *buf)
 
 void do_update(FORM *form, FIELD **field)
 {
+  unsigned long long a;
+  unsigned long long b;
   unsigned long long v;
   unsigned start;
   unsigned end;
@@ -29,20 +31,66 @@ void do_update(FORM *form, FIELD **field)
   char buf[CUTBUF_LEN];
   char *val;
   char *bit;
+  char *ep;
+  char *op;
   int set;
   
   form_driver(form, REQ_VALIDATION);
   val = field_buffer(field[0], 0);
   bit = field_buffer(field[1], 0);
-  
+
+  while (*val && (*val == ' '))
+    val++;
   if (!strncmp(val, "0b", 2))
-    v = strtoull(val + 2, NULL, 2);
-  else if (!strncmp(val, "0x", 2))
-    v = strtoull(val + 2, NULL, 16);
-  else if (val[0] == '0')
-    v = strtoull(val + 1, NULL, 8);
+    a = strtoull(val + 2, &op, 2);
   else
-    v = strtoull(val, NULL, 10);
+    a = strtoull(val, &op, 0);
+
+  while (*op && (*op == ' '))
+    op++;
+  switch (*op)
+  {
+  case '+':
+  case '-':
+  case '*':
+  case '/':
+  case '%':
+    ep = op + 1;
+    while (*ep && (*ep == ' '))
+      ep++;
+    if (!strncmp(ep, "0b", 2))
+      b = strtoull(ep + 2, NULL, 2);
+    else
+      b = strtoull(ep, NULL, 0);
+    switch(*op)
+    {
+    case '+':
+      v = a + b;
+      break;
+    case '-':
+      v = a - b;
+      break;
+    case '*':
+      v = a * b;
+      break;
+    case '/':
+      if (b)
+	v = a / b;
+      else
+	v = a;
+      break;
+    case '%':
+      if (b)
+	v = a % b;
+      else
+	v = a;
+      break;
+    }
+    break;
+  default:
+    v = a;
+    break;
+  }
 
   set = 0;
   if (sscanf(bit, "%u:%u", &start, &end) == 2)
