@@ -8,6 +8,8 @@ Enter your value in the first field:
 - 0..... for octal
 - ...... for decimal
 
+You can use one simple operator (+-*/%).
+
 Then you can enter a bit slice to use on the second field like:
 - start:end
 - end:start
@@ -23,3 +25,4 @@ Made while developping/debugging verilog code, after spending way too many hours
 # Compiling
 
 Might need to add -lbsd to LDFLAGS to compile on linux, not tested.
+
