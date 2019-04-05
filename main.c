@@ -119,6 +119,7 @@ int main(int ac, char **av)
 
   for (quit = 0; !quit;)
   {
+    do_update(form, field);
     ch = getch();
     switch(ch)
     {
@@ -165,7 +166,6 @@ int main(int ac, char **av)
       form_driver(form, ch);
       break;
     }
-    do_update(form, field);
   }
 
   unpost_form(form);
