@@ -25,7 +25,6 @@ void do_update(FORM *form, FIELD **field)
   char buf[CUTBUF_LEN];
   char *val;
   char *bit;
-  int i;
   
   form_driver(form, REQ_VALIDATION);
   val = field_buffer(field[0], 0);
@@ -52,11 +51,8 @@ void do_update(FORM *form, FIELD **field)
       }
       end -= start;
       v >>= start;
-      for (i = 0; i < 64; i++)
-      {
-	if (i > end)
-	  v &= ~(1ULL << i);
-      }
+      v <<= 63 - end;
+      v >>= 63 - end;
     }
   }
 
