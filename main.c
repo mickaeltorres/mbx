@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
 #include <ncurses.h>
 #include <form.h>
 #include <string.h>
@@ -90,9 +92,9 @@ int main(int ac, char **av)
   noecho();
 
   for (i = 0; i < 7; i++)
-    field[i] = new_field(1, CUTBUF_LEN - 1, i + 1, 12, 0, 0);
+    field[i] = new_field(1, CUTBUF_LEN - 1, i < 2 ? i + 1 : i + 2, 12, 0, 0);
   for (i = 7; i < 14; i++)
-    field[i] = new_field(1, 10, i - 6, 1, 0, 0);
+    field[i] = new_field(1, 10, i < 9 ? i - 6 : i - 5, 1, 0, 0);
   field[14] = NULL;
 
   for (i = 0; i < 2; i++)
@@ -123,6 +125,13 @@ int main(int ac, char **av)
     ch = getch();
     switch(ch)
     {
+    case KEY_CTRL('z'):
+      def_prog_mode();
+      endwin();
+      kill(getpid(), SIGSTOP);
+      reset_prog_mode();
+      refresh();
+      break;
     case KEY_CTRL('c'):
     case KEY_CTRL('q'):
       quit = 1;
