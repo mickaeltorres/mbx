@@ -29,6 +29,7 @@ void do_update(FORM *form, FIELD **field)
   char buf[CUTBUF_LEN];
   char *val;
   char *bit;
+  int set;
   
   form_driver(form, REQ_VALIDATION);
   val = field_buffer(field[0], 0);
@@ -43,6 +44,7 @@ void do_update(FORM *form, FIELD **field)
   else
     v = strtoull(val, NULL, 10);
 
+  set = 0;
   if (sscanf(bit, "%u:%u", &start, &end) == 2)
   {
     if ((start < 64) && (end < 64))
@@ -53,13 +55,14 @@ void do_update(FORM *form, FIELD **field)
 	start = end;
 	end = tmp;
       }
+      set = 1;
       end -= start;
       v >>= start;
       v <<= 63 - end;
       v >>= 63 - end;
     }
   }
-  else
+  if (set == 0)
   {
     start = 0;
     end = 63;
