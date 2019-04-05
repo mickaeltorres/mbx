@@ -11,6 +11,7 @@ Enter your value in the first field:
 Then you can enter a bit slice to use on the second field like:
 - start:end
 - end:start
+
 It will use only the bits between start and end inclusive.
 
 Ctrl+C or Ctrl+Q to quit.
