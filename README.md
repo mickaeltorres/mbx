@@ -19,3 +19,7 @@ Ctrl+C or Ctrl+Q to quit.
 # Why ?
 
 Made while developping/debugging verilog code, after spending way too many hours counting bits on the screen in bc.
+
+# Compiling
+
+Might need to add -lbsd to LDFLAGS to compile on linux, not tested.
