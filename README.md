@@ -24,5 +24,5 @@ Made while developping/debugging verilog code, after spending way too many hours
 
 # Compiling
 
-Might need to add -lbsd to LDFLAGS to compile on linux, not tested.
-
+Should compile directly on *BSD.
+Needs ncurses (and -dev) and libbsd on Linux.

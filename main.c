@@ -6,6 +6,10 @@
 #include <string.h>
 #include <stdio.h>
 
+#ifdef __linux__
+#include <bsd/bsd.h>
+#endif
+
 #define KEY_CTRL(K) ((K) & 0x1f)
 #define CUTBUF_LEN 67
 

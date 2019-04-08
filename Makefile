@@ -2,7 +2,8 @@ NAME=mbx
 SRC=main.c
 OBJ=$(SRC:.c=.o)
 CFLAGS=-Wall -Werror
-LDFLAGS=-lncurses -lform
+LDLOCALFLAGS=`uname | grep -q Linux && echo -lbsd`
+LDFLAGS=-lncurses -lform $(LDLOCALFLAGS)
 
 LD=$(CC)
 RM=rm -fr
@@ -10,7 +11,7 @@ RM=rm -fr
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(LD) $(LDFLAGS) -o $(NAME) $(OBJ)
+	$(LD) -o $(NAME) $(OBJ) $(LDFLAGS)
 
 clean:
 	$(RM) $(OBJ) $(NAME)
