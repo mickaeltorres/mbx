@@ -221,6 +221,10 @@ int main(int ac, char **av)
     case KEY_RIGHT:
       form_driver(form, REQ_NEXT_CHAR);
       break;
+    case KEY_CTRL('d'):
+      form_driver(form, REQ_DEL_CHAR);
+      break;
+    case 0x7f:
     case KEY_BACKSPACE:
       form_driver(form, REQ_DEL_PREV);
       break;
