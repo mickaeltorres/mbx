@@ -126,7 +126,7 @@ void do_update(FORM *form, FIELD **field)
 
   memset(buf, ' ', CUTBUF_LEN - 1);
   buf[CUTBUF_LEN - 1] = '\0';
-  buf[63-end] = '^';
+  buf[63-(end+start)] = '^';
   buf[63-start] = '^';
   set_field_buffer(field[3], 0, buf);
   ull2bin(v, end, buf);
