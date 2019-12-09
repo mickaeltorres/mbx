@@ -5,6 +5,7 @@
 #include <form.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #ifdef __linux__
 #include <bsd/bsd.h>
@@ -39,7 +40,7 @@ void do_update(FORM *form, FIELD **field)
   char *ep;
   char *op;
   int set;
-  
+
   form_driver(form, REQ_VALIDATION);
   val = field_buffer(field[0], 0);
   bit = field_buffer(field[1], 0);
@@ -50,6 +51,8 @@ void do_update(FORM *form, FIELD **field)
     a = strtoull(val + 2, &op, 2);
   else
     a = strtoull(val, &op, 0);
+  if (isxdigit(*op))
+    a = strtoull(val, &op, 16);
 
   while (*op && (*op == ' '))
     op++;
@@ -64,9 +67,11 @@ void do_update(FORM *form, FIELD **field)
     while (*ep && (*ep == ' '))
       ep++;
     if (!strncmp(ep, "0b", 2))
-      b = strtoull(ep + 2, NULL, 2);
+      b = strtoull(ep + 2, &val, 2);
     else
-      b = strtoull(ep, NULL, 0);
+      b = strtoull(ep, &val, 0);
+    if (isxdigit(*val))
+      b = strtoull(ep, NULL, 16);
     switch(*op)
     {
     case '+':
@@ -99,7 +104,7 @@ void do_update(FORM *form, FIELD **field)
 
   ull2bin(v, 63, buf);
   set_field_buffer(field[2], 0, buf);
-  
+
   set = 0;
   if (sscanf(bit, "%u:%u", &start, &end) == 2)
   {
@@ -151,7 +156,7 @@ int main(int ac, char **av)
   int i;
 
   cutbuf[0] = '\0';
-  
+
   initscr();
   raw();
   keypad(stdscr, TRUE);
@@ -181,10 +186,10 @@ int main(int ac, char **av)
   set_field_buffer(field[15], 0, "decimal :");
   set_field_buffer(field[16], 0, "hexa    :");
   set_field_buffer(field[17], 0, "bit vec.:");
-  
+
   form = new_form(field);
   post_form(form);
-  
+
   refresh();
 
   for (quit = 0; !quit;)
@@ -253,7 +258,7 @@ int main(int ac, char **av)
   free_form(form);
   for (i = 0; i < NFIELDS; i++)
     free_field(field[i]);
-  
+
   endwin();
   return EXIT_SUCCESS;
 }
