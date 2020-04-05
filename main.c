@@ -13,7 +13,7 @@
 
 #define KEY_CTRL(K) ((K) & 0x1f)
 #define CUTBUF_LEN 67
-#define NFIELDS 18
+#define NFIELDS 20
 
 void ull2bin(unsigned long long v, unsigned end, char *buf)
 {
@@ -24,6 +24,24 @@ void ull2bin(unsigned long long v, unsigned end, char *buf)
   for (i = s; i > 0; i--)
     buf[s - i] = (v & (1ULL << (i - 1))) ? '1' : '0';
   buf[s - i] = '\0';
+}
+
+void ull2ascii(unsigned long long v, unsigned end, char *buf)
+{
+  int c;
+  int i;
+  char ch;
+
+  for (i = 0, c = 0; i < 64; c++, i += 8)
+  {
+    ch = ((v >> i) & 0xff);
+    if ((ch > ' ') && (ch < 0x7f))
+      buf[c] = ch;
+    else
+      buf[c] = ' ';
+  }
+
+  buf[c] = '\0';
 }
 
 void do_update(FORM *form, FIELD **field)
@@ -142,8 +160,10 @@ void do_update(FORM *form, FIELD **field)
   set_field_buffer(field[6], 0, buf);
   snprintf(buf, CUTBUF_LEN - 1, "%llx", v);
   set_field_buffer(field[7], 0, buf);
-  snprintf(buf, CUTBUF_LEN - 1, "[%u:0] = %u bits", end, end + 1);
+  ull2ascii(v, end, buf);
   set_field_buffer(field[8], 0, buf);
+  snprintf(buf, CUTBUF_LEN - 1, "[%u:0] = %u bits", end, end + 1);
+  set_field_buffer(field[9], 0, buf);
 }
 
 int main(int ac, char **av)
@@ -165,7 +185,7 @@ int main(int ac, char **av)
   for (i = 0; i < (NFIELDS / 2); i++)
     field[i] = new_field(1, CUTBUF_LEN - 1, i < 2 ? i + 1 : i + 2, 12, 0, 0);
   for (; i < NFIELDS; i++)
-    field[i] = new_field(1, 10, i < 11 ? i - 8 : i - 7, 1, 0, 0);
+    field[i] = new_field(1, 10, i < 12 ? i - 9 : i - 8, 1, 0, 0);
   field[NFIELDS] = NULL;
 
   for (i = 0; i < 2; i++)
@@ -177,15 +197,16 @@ int main(int ac, char **av)
 
   for (i = 2; i < NFIELDS; i++)
     field_opts_off(field[i], O_ACTIVE);
-  set_field_buffer(field[9], 0, "value   :");
-  set_field_buffer(field[10], 0, "bit sli.:");
-  set_field_buffer(field[11], 0, "full bin:");
-  set_field_buffer(field[12], 0, "range   :");
-  set_field_buffer(field[13], 0, "binary  :");
-  set_field_buffer(field[14], 0, "octal   :");
-  set_field_buffer(field[15], 0, "decimal :");
-  set_field_buffer(field[16], 0, "hexa    :");
-  set_field_buffer(field[17], 0, "bit vec.:");
+  set_field_buffer(field[10], 0, "value   :");
+  set_field_buffer(field[11], 0, "bit sli.:");
+  set_field_buffer(field[12], 0, "full bin:");
+  set_field_buffer(field[13], 0, "range   :");
+  set_field_buffer(field[14], 0, "binary  :");
+  set_field_buffer(field[15], 0, "octal   :");
+  set_field_buffer(field[16], 0, "decimal :");
+  set_field_buffer(field[17], 0, "hexa    :");
+  set_field_buffer(field[18], 0, "ascii   :");
+  set_field_buffer(field[19], 0, "bit vec.:");
 
   form = new_form(field);
   post_form(form);
